@@ -9,7 +9,6 @@ const Category = require('../models/category.model');
 const seed = async () => {
   await connectDB();
 
-  // Vaciamos las colecciones antes de insertar los datos de prueba
   await Promise.all([User.deleteMany(), Product.deleteMany(), Category.deleteMany()]);
 
   const categories = await Category.insertMany([
@@ -27,28 +26,33 @@ const seed = async () => {
       category: verduras._id,
       description: 'Tomate de temporada cultivado en Navarra',
       price: 3.5,
-      stock: 40
+      stock: 40,
+      season: {startMonth: 6, endMonth: 10}
     },
     {
       name: 'Pimiento del piquillo',
       category: verduras._id,
       description: 'Pimiento asado tradicional',
       price: 4.2,
-      stock: 25
+      stock: 25,
+      season: {startMonth: 8, endMonth: 11}
     },
     {
       name: 'Manzana Reineta',
       category: frutas._id,
       description: 'Manzana ácida, ideal para postres',
       price: 2.8,
-      stock: 60
+      stock: 60,
+
+      season: {startMonth: 10, endMonth: 2}
     },
     {
       name: 'Pera Conferencia',
       category: frutas._id,
       description: 'Pera dulce y jugosa',
       price: 2.5,
-      stock: 35
+      stock: 35,
+      season: {startMonth: 8, endMonth: 12}
     },
     {
       name: 'Alubia pinta',
@@ -56,6 +60,7 @@ const seed = async () => {
       description: 'Alubia seca de cosecha propia',
       price: 5.0,
       stock: 20
+
     },
     {
       name: 'Miel de Navarra',
