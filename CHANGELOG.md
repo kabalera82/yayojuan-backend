@@ -26,6 +26,15 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
   y cambio de estado por un administrador.
 - Script `npm run seed` para insertar datos de prueba de usuarios, categorías y
   productos.
+- Campo `season` (temporada) en productos, con inicio y fin de mes.
+- Mensajes de contacto (`/api/contact`): cualquiera puede enviar uno (se guarda en
+  Mongo), y avisa por Telegram si `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` están
+  configurados; solo un admin puede listarlos.
+
+### Changed
+
+- Todas las respuestas de error se han simplificado a un único criterio: `200` para
+  éxito, `400` para cualquier error, sin distinguir el motivo en el código de estado.
 
 ### Fixed
 
@@ -34,3 +43,6 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
   usuario funcionaba hasta este arreglo.
 - `src/config/db.js` imprimía la cadena de conexión completa (con usuario y
   contraseña) en el log en cada arranque del servidor.
+- `login` no traía el `password` del usuario (`select: false` en el modelo), así que
+  la comprobación de contraseña fallaba siempre.
+- `src/config/cloudynary.js` estaba vacío pese a estar ya montado en el proyecto.
