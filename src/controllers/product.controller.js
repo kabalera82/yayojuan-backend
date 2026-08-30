@@ -1,6 +1,6 @@
 const Product = require('../models/product.model');
 
-const UPDATABLE_FIELDS = ['name', 'category', 'description', 'price', 'stock', 'image'];
+const UPDATABLE_FIELDS = ['name', 'category', 'description', 'price', 'stock', 'image', 'season'];
 
 // Lista los productos, opcionalmente filtrados por categoría (?category=<id>)
 const getProducts = async (req, res) => {
@@ -13,7 +13,7 @@ const getProducts = async (req, res) => {
     const products = await Product.find(filter).populate('category').sort({name: 1});
     return res.status(200).json(products);
   } catch {
-    return res.status(500).json({message: 'Error al obtener los productos'});
+    return res.status(400).json({message: 'No se pudieron obtener los productos'});
   }
 };
 
@@ -24,35 +24,37 @@ const getProductById = async (req, res) => {
     const product = await Product.findById(id).populate('category');
 
     if (!product) {
-      return res.status(404).json({message: 'Producto no encontrado'});
+      return res.status(400).json({message: 'Producto no encontrado'});
     }
 
     return res.status(200).json(product);
   } catch {
-    return res.status(500).json({message: 'Error al obtener el producto'});
+    return res.status(400).json({message: 'No se pudo obtener el producto'});
   }
 };
 
 // Crea un nuevo producto
 const createProduct = async (req, res) => {
   try {
-    const {name, category, description, price, stock, image} = req.body;
+    const {name, category, description, price, stock, image, season} = req.body;
 
     if (!name || !category) {
       return res.status(400).json({message: 'El nombre y la categoría son obligatorios'});
     }
 
-    const product = await Product.create({name, category, description, price, stock, image});
+    const product = await Product.create({
+      name,
+      category,
+      description,
+      price,
+      stock,
+      image,
+      season
+    });
 
-    return res.status(201).json(product);
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({message: 'Ya existe un producto con ese nombre'});
-    }
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({message: error.message});
-    }
-    return res.status(500).json({message: 'Error al crear el producto'});
+    return res.status(200).json(product);
+  } catch {
+    return res.status(400).json({message: 'No se pudo crear el producto'});
   }
 };
 
@@ -74,18 +76,12 @@ const updateProduct = async (req, res) => {
     }).populate('category');
 
     if (!product) {
-      return res.status(404).json({message: 'Producto no encontrado'});
+      return res.status(400).json({message: 'Producto no encontrado'});
     }
 
     return res.status(200).json(product);
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({message: 'Ya existe un producto con ese nombre'});
-    }
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({message: error.message});
-    }
-    return res.status(500).json({message: 'Error al actualizar el producto'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo actualizar el producto'});
   }
 };
 
@@ -96,12 +92,12 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
-      return res.status(404).json({message: 'Producto no encontrado'});
+      return res.status(400).json({message: 'Producto no encontrado'});
     }
 
     return res.status(200).json({message: 'Producto eliminado correctamente'});
   } catch {
-    return res.status(500).json({message: 'Error al eliminar el producto'});
+    return res.status(400).json({message: 'No se pudo eliminar el producto'});
   }
 };
 

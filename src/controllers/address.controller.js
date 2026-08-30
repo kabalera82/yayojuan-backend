@@ -18,13 +18,10 @@ const addAddress = async (req, res) => {
     await req.user.save();
 
     return res
-      .status(201)
+      .status(200)
       .json({message: 'Dirección añadida correctamente', addresses: req.user.addresses});
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({message: error.message});
-    }
-    return res.status(500).json({message: 'Error al añadir la dirección'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo añadir la dirección'});
   }
 };
 
@@ -35,7 +32,7 @@ const updateAddress = async (req, res) => {
     const address = req.user.addresses.id(addressId);
 
     if (!address) {
-      return res.status(404).json({message: 'Dirección no encontrada'});
+      return res.status(400).json({message: 'Dirección no encontrada'});
     }
 
     const {street, city, postalCode, country, isDefault} = req.body;
@@ -57,11 +54,8 @@ const updateAddress = async (req, res) => {
     return res
       .status(200)
       .json({message: 'Dirección actualizada correctamente', addresses: req.user.addresses});
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({message: error.message});
-    }
-    return res.status(500).json({message: 'Error al actualizar la dirección'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo actualizar la dirección'});
   }
 };
 
@@ -72,7 +66,7 @@ const deleteAddress = async (req, res) => {
     const address = req.user.addresses.id(addressId);
 
     if (!address) {
-      return res.status(404).json({message: 'Dirección no encontrada'});
+      return res.status(400).json({message: 'Dirección no encontrada'});
     }
 
     address.deleteOne();
@@ -83,7 +77,7 @@ const deleteAddress = async (req, res) => {
       .status(200)
       .json({message: 'Dirección eliminada correctamente', addresses: req.user.addresses});
   } catch {
-    return res.status(500).json({message: 'Error al eliminar la dirección'});
+    return res.status(400).json({message: 'No se pudo eliminar la dirección'});
   }
 };
 

@@ -6,7 +6,7 @@ const isAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-      return res.status(401).json({message: 'No autenticado'});
+      return res.status(400).json({message: 'No autenticado'});
     }
 
     const token = authHeader.replace('Bearer ', '');
@@ -16,13 +16,13 @@ const isAuth = async (req, res, next) => {
     const user = await User.findById(decoded.id).select('+password');
 
     if (!user) {
-      return res.status(401).json({message: 'No autenticado'});
+      return res.status(400).json({message: 'No autenticado'});
     }
 
     req.user = user;
     next();
   } catch {
-    return res.status(401).json({message: 'No autenticado'});
+    return res.status(400).json({message: 'No autenticado'});
   }
 };
 

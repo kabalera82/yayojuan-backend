@@ -15,15 +15,9 @@ const register = async (req, res) => {
 
     await newUser.save();
 
-    return res.status(201).json({message: 'Usuario creado correctamente'});
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({message: 'Ese email ya está registrado'});
-    }
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({message: error.message});
-    }
-    return res.status(500).json({message: 'Error al crear el usuario'});
+    return res.status(200).json({message: 'Usuario creado correctamente'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo crear el usuario'});
   }
 };
 
@@ -36,7 +30,7 @@ const login = async (req, res) => {
       return res.status(400).json({message: 'Todos los campos son obligatorios'});
     }
 
-    const user = await User.findOne({email});
+    const user = await User.findOne({email}).select('+password');
 
     if (!user) {
       return res.status(400).json({message: 'Usuario no encontrado'});
@@ -56,8 +50,8 @@ const login = async (req, res) => {
       token,
       user: userLogin
     });
-  } catch (error) {
-    return res.status(500).json({error: error.message});
+  } catch {
+    return res.status(400).json({message: 'No se pudo iniciar sesión'});
   }
 };
 
@@ -66,8 +60,8 @@ const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     return res.status(200).json(user);
-  } catch (error) {
-    return res.status(500).json({error: error.message});
+  } catch {
+    return res.status(400).json({message: 'No se pudo obtener el usuario'});
   }
 };
 
@@ -87,14 +81,8 @@ const updateUser = async (req, res) => {
     await req.user.save();
 
     return res.status(200).json({message: 'Perfil actualizado correctamente'});
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({message: 'Ese email ya está registrado'});
-    }
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({message: error.message});
-    }
-    return res.status(500).json({message: 'Error al actualizar el perfil'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo actualizar el perfil'});
   }
 };
 
@@ -114,8 +102,8 @@ const updatePassword = async (req, res) => {
     req.user.password = newPassword;
     await req.user.save();
     return res.status(200).json({message: 'Contraseña actualizada correctamente'});
-  } catch (error) {
-    return res.status(500).json({error: error.message});
+  } catch {
+    return res.status(400).json({message: 'No se pudo actualizar la contraseña'});
   }
 };
 
