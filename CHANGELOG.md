@@ -31,10 +31,25 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
   Mongo), y avisa por Telegram si `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` están
   configurados; solo un admin puede listarlos.
 
+- `POST /api/orders/request`: crea el pedido con el carrito que envía el cliente y avisa
+  por Telegram con los datos del usuario, la dirección de envío, las líneas y el total.
+  Nombres, precios y stock se leen de la base de datos, nunca de lo que manda el cliente.
+- `DELETE /api/contact/:id`: un admin puede borrar un mensaje de contacto.
+
 ### Changed
 
 - Todas las respuestas de error se han simplificado a un único criterio: `200` para
   éxito, `400` para cualquier error, sin distinguir el motivo en el código de estado.
+- El puerto y los orígenes permitidos por CORS se leen del `.env` (`PORT` y
+  `ALLOWED_ORIGINS`, lista separada por comas), con `3000` y `http://localhost:5173`
+  como valores por defecto.
+- `isAuth` e `isAdmin` viven juntos en `src/middlewares/auth.middleware.js`, que ahora
+  exporta las dos funciones. Desaparece `isAdmin.middleware.js`.
+
+### Removed
+
+- `POST /api/orders` y el campo `cart` del modelo `User`: no existía ningún endpoint que
+  escribiera ese carrito, así que ese pedido fallaba siempre con "El carrito está vacío".
 
 ### Fixed
 
