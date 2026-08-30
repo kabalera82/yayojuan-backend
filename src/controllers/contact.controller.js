@@ -30,4 +30,17 @@ const getContacts = async (req, res) => {
   }
 };
 
-module.exports = {createContact, getContacts};
+// Elimina un mensaje de contacto por su ID (admin)
+const deleteContact = async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+    if (!contact) {
+      return res.status(400).json({message: 'Mensaje no encontrado'});
+    }
+    return res.status(200).json({message: 'Mensaje eliminado correctamente'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo eliminar el mensaje'});
+  }
+};
+
+module.exports = {createContact, getContacts, deleteContact};
