@@ -1,5 +1,5 @@
 const express = require('express');
-const isAuth = require('../middlewares/auth.middleware');
+const {isAuth} = require('../middlewares/auth.middleware');
 const {
   register,
   login,

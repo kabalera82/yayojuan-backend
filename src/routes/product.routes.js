@@ -1,6 +1,5 @@
 const express = require('express');
-const auth = require('../middlewares/auth.middleware');
-const isAdmin = require('../middlewares/isAdmin.middleware');
+const {isAuth, isAdmin} = require('../middlewares/auth.middleware');
 const {
   getProducts,
   getProductById,
@@ -16,8 +15,8 @@ router.get('/', getProducts);
 router.get('/:id', getProductById);
 
 // Gestionar el catálogo es solo para admins
-router.post('/', auth, isAdmin, createProduct);
-router.patch('/:id', auth, isAdmin, updateProduct);
-router.delete('/:id', auth, isAdmin, deleteProduct);
+router.post('/', isAuth, isAdmin, createProduct);
+router.patch('/:id', isAuth, isAdmin, updateProduct);
+router.delete('/:id', isAuth, isAdmin, deleteProduct);
 
 module.exports = router;

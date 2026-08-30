@@ -1,6 +1,5 @@
 const express = require('express');
-const auth = require('../middlewares/auth.middleware');
-const isAdmin = require('../middlewares/isAdmin.middleware');
+const {isAuth, isAdmin} = require('../middlewares/auth.middleware');
 const {
   getCategories,
   createCategory,
@@ -14,8 +13,8 @@ const router = express.Router();
 router.get('/', getCategories);
 
 // Gestionar el catálogo es solo para admins
-router.post('/', auth, isAdmin, createCategory);
-router.patch('/:id', auth, isAdmin, updateCategory);
-router.delete('/:id', auth, isAdmin, deleteCategory);
+router.post('/', isAuth, isAdmin, createCategory);
+router.patch('/:id', isAuth, isAdmin, updateCategory);
+router.delete('/:id', isAuth, isAdmin, deleteCategory);
 
 module.exports = router;

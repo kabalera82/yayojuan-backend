@@ -26,4 +26,12 @@ const isAuth = async (req, res, next) => {
   }
 };
 
-module.exports = isAuth;
+// Debe ir después de isAuth: exige que el usuario autenticado tenga role "admin"
+const isAdmin = (req, res, next) => {
+  if (req.user?.role !== 'admin') {
+    return res.status(400).json({message: 'No tienes permisos para esta acción'});
+  }
+  next();
+};
+
+module.exports = {isAuth, isAdmin};
