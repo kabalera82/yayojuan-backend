@@ -1,8 +1,7 @@
 const express = require('express');
-const auth = require('../middlewares/auth.middleware');
-const isAdmin = require('../middlewares/isAdmin.middleware');
+const {isAuth, isAdmin} = require('../middlewares/auth.middleware');
 const {
-  createOrder,
+  requestOrder,
   getMyOrders,
   getOrders,
   getOrderById,
@@ -12,9 +11,9 @@ const {
 const router = express.Router();
 
 // Todas las rutas de pedidos requieren estar autenticado
-router.use(auth);
+router.use(isAuth);
 
-router.post('/', createOrder);
+router.post('/request', requestOrder);
 router.get('/mine', getMyOrders);
 
 // Gestión de pedidos: solo admin

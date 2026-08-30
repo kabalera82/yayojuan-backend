@@ -1,33 +1,54 @@
 const Order = require('../models/order.model');
+const Product = require('../models/product.model');
+const sendTelegramMessage = require('../config/telegram');
 
-// Crea un pedido a partir del carrito del usuario autenticado y una dirección ya guardada
-const createOrder = async (req, res) => {
+// Crea un pedido con el carrito que envía el cliente y avisa por Telegram
+const requestOrder = async (req, res) => {
   try {
-    const {addressId} = req.body;
+    const {items} = req.body;
 
-    if (!req.user.cart.length) {
+    if (!Array.isArray(items) || !items.length) {
       return res.status(400).json({message: 'El carrito está vacío'});
     }
 
-    const address = req.user.addresses.id(addressId);
+    const address = req.user.addresses.find((entry) => entry.isDefault) || req.user.addresses[0];
+
     if (!address) {
-      return res.status(400).json({message: 'Dirección de envío no encontrada'});
+      return res
+        .status(400)
+        .json({message: 'Añade una dirección de envío antes de solicitar el pedido'});
     }
 
-    await req.user.populate('cart.product');
+    // Nombres y precios se leen de la base de datos, nunca de lo que manda el cliente
+    const products = await Product.find({_id: {$in: items.map((item) => item.product)}});
 
-    const items = req.user.cart.map((entry) => ({
-      product: entry.product._id,
-      name: entry.product.name,
-      quantity: entry.quantity,
-      price: entry.product.price
-    }));
+    if (products.length !== items.length) {
+      return res.status(400).json({message: 'Algún producto del carrito ya no está disponible'});
+    }
 
-    const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const orderItems = [];
+
+    for (const item of items) {
+      const product = products.find((entry) => entry._id.equals(item.product));
+
+      // El stock del carrito puede estar obsoleto o manipulado: manda el de la base de datos
+      if (item.quantity > product.stock) {
+        return res.status(400).json({message: `No hay stock suficiente de ${product.name}`});
+      }
+
+      orderItems.push({
+        product: product._id,
+        name: product.name,
+        quantity: item.quantity,
+        price: product.price
+      });
+    }
+
+    const totalPrice = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const order = await Order.create({
       user: req.user._id,
-      items,
+      items: orderItems,
       shippingAddress: {
         street: address.street,
         city: address.city,
@@ -37,12 +58,23 @@ const createOrder = async (req, res) => {
       totalPrice
     });
 
-    req.user.cart = [];
-    await req.user.save();
+    const lines = orderItems.map(
+      (item) => `- ${item.name} x${item.quantity} — ${(item.price * item.quantity).toFixed(2)} €`
+    );
+
+    await sendTelegramMessage(
+      'Nuevo pedido solicitado\n' +
+        `Cliente: ${req.user.username} ${req.user.userSurname}\n` +
+        `Email: ${req.user.email}\n` +
+        `Teléfono: ${req.user.phone}\n` +
+        `Envío: ${address.street}, ${address.postalCode} ${address.city} (${address.country})\n\n` +
+        `${lines.join('\n')}\n\n` +
+        `Total: ${totalPrice.toFixed(2)} €`
+    );
 
     return res.status(200).json(order);
   } catch {
-    return res.status(400).json({message: 'No se pudo crear el pedido'});
+    return res.status(400).json({message: 'No se pudo solicitar el pedido'});
   }
 };
 
@@ -132,4 +164,4 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = {createOrder, getMyOrders, getOrders, getOrderById, updateOrderStatus};
+module.exports = {requestOrder, getMyOrders, getOrders, getOrderById, updateOrderStatus};
