@@ -16,14 +16,15 @@ connectionDB();
 
 // Creamos el Servidor
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+// Orígenes permitidos: lista separada por comas en el .env, o el Vite local por defecto
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim());
 
 // Middlewares ---------------
-app.use(
-  cors({
-    origin: 'http://localhost:5173' //
-  })
-);
+app.use(cors({origin: allowedOrigins}));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
