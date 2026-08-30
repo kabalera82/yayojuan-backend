@@ -9,6 +9,7 @@ const addressRoutes = require('./src/routes/address.routes');
 const categoryRoutes = require('./src/routes/category.routes');
 const productRoutes = require('./src/routes/product.routes');
 const orderRoutes = require('./src/routes/order.routes');
+const contactRoutes = require('./src/routes/contact.routes');
 
 // Conexion
 connectionDB();
@@ -32,6 +33,7 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Pruebas
 app.get('/pruebas', (req, res) => {
