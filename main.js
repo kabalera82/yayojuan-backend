@@ -14,7 +14,6 @@ const contactRoutes = require('./src/routes/contact.routes');
 connectionDB();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
   .split(',')
@@ -38,6 +37,11 @@ app.get('/pruebas', (req, res) => {
   `);
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT} 🎉🎉🎉🎉`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT} 🎉🎉🎉🎉`);
+  });
+}
+
+module.exports = app;
