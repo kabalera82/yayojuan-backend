@@ -1,8 +1,8 @@
 const Product = require('../models/product.model');
+const {subirImagen} = require('../services/imagenes');
 
 const UPDATABLE_FIELDS = ['name', 'category', 'description', 'price', 'stock', 'image', 'season'];
 
-// Lista los productos, opcionalmente filtrados por categoría (?category=<id>)
 const getProducts = async (req, res) => {
   try {
     const filter = {};
@@ -17,7 +17,6 @@ const getProducts = async (req, res) => {
   }
 };
 
-// Devuelve un producto por su id
 const getProductById = async (req, res) => {
   try {
     const {id} = req.params;
@@ -33,14 +32,15 @@ const getProductById = async (req, res) => {
   }
 };
 
-// Crea un nuevo producto
 const createProduct = async (req, res) => {
   try {
-    const {name, category, description, price, stock, image, season} = req.body;
+    const {name, category, description, price, stock, season} = req.body;
 
     if (!name || !category) {
       return res.status(400).json({message: 'El nombre y la categoría son obligatorios'});
     }
+
+    const image = req.file ? await subirImagen(req.file) : undefined;
 
     const product = await Product.create({
       name,
@@ -58,7 +58,6 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Actualiza un producto existente
 const updateProduct = async (req, res) => {
   try {
     const {id} = req.params;
@@ -68,6 +67,10 @@ const updateProduct = async (req, res) => {
       if (req.body[field] !== undefined) {
         updates[field] = req.body[field];
       }
+    }
+
+    if (req.file) {
+      updates.image = await subirImagen(req.file);
     }
 
     const product = await Product.findByIdAndUpdate(id, updates, {
@@ -85,7 +88,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Elimina un producto
 const deleteProduct = async (req, res) => {
   try {
     const {id} = req.params;

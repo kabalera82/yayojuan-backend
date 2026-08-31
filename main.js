@@ -11,24 +11,19 @@ const productRoutes = require('./src/routes/product.routes');
 const orderRoutes = require('./src/routes/order.routes');
 const contactRoutes = require('./src/routes/contact.routes');
 
-// Conexion
 connectionDB();
 
-// Creamos el Servidor
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Orígenes permitidos: lista separada por comas en el .env, o el Vite local por defecto
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim());
 
-// Middlewares ---------------
-app.use(cors({origin: allowedOrigins}));
+app.use(cors({origin: allowedOrigins.includes('*') ? true : allowedOrigins}));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// Rutas
 app.use('/api/users', userRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -36,7 +31,6 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
 
-// Pruebas
 app.get('/pruebas', (req, res) => {
   console.log('Petición de prueba recibida');
   return res.status(200).send(`

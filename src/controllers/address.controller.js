@@ -1,4 +1,3 @@
-// Añade una nueva dirección al usuario autenticado
 const addAddress = async (req, res) => {
   try {
     const {street, city, postalCode, country, isDefault} = req.body;
@@ -25,7 +24,6 @@ const addAddress = async (req, res) => {
   }
 };
 
-// Actualiza una dirección existente del usuario autenticado
 const updateAddress = async (req, res) => {
   try {
     const {addressId} = req.params;
@@ -59,7 +57,6 @@ const updateAddress = async (req, res) => {
   }
 };
 
-// Elimina una dirección del usuario autenticado
 const deleteAddress = async (req, res) => {
   try {
     const {addressId} = req.params;
