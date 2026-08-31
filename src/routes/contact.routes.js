@@ -4,10 +4,8 @@ const {createContact, getContacts, deleteContact} = require('../controllers/cont
 
 const router = express.Router();
 
-// Cualquiera puede enviar un mensaje de contacto
 router.post('/', createContact);
 
-// Solo un admin puede leer o borrar los mensajes recibidos
 router.get('/', isAuth, isAdmin, getContacts);
 router.delete('/:id', isAuth, isAdmin, deleteContact);
 

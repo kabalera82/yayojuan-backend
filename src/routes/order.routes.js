@@ -1,26 +1,30 @@
 const express = require('express');
 const {isAuth, isAdmin} = require('../middlewares/auth.middleware');
+const upload = require('../middlewares/upload.middleware');
 const {
   requestOrder,
   getMyOrders,
   getOrders,
   getOrderById,
-  updateOrderStatus
+  updateOrderStatus,
+  updateOrder
 } = require('../controllers/order.controller');
+
+const {exportarPedidos, importarPedidos} = require('../controllers/pedidoscsv.controller');
 
 const router = express.Router();
 
-// Todas las rutas de pedidos requieren estar autenticado
 router.use(isAuth);
 
 router.post('/request', requestOrder);
 router.get('/mine', getMyOrders);
 
-// Gestión de pedidos: solo admin
 router.get('/', isAdmin, getOrders);
+router.get('/export', isAdmin, exportarPedidos);
+router.post('/import', isAdmin, upload.single('file'), importarPedidos);
 router.patch('/:id/status', isAdmin, updateOrderStatus);
+router.patch('/:id', isAdmin, updateOrder);
 
-// Rutas con parámetro al final, para no capturar "/mine" ni las de arriba
 router.get('/:id', getOrderById);
 
 module.exports = router;

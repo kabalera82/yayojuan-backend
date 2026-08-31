@@ -35,6 +35,20 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
   por Telegram con los datos del usuario, la dirección de envío, las líneas y el total.
   Nombres, precios y stock se leen de la base de datos, nunca de lo que manda el cliente.
 - `DELETE /api/contact/:id`: un admin puede borrar un mensaje de contacto.
+- Gestión de usuarios para el panel de administración (`GET /api/users`,
+  `POST /api/users` con rol, `DELETE /api/users/:id`). El registro público
+  (`POST /api/users/register`) sigue ignorando cualquier rol enviado por el cliente.
+- `DELETE /api/users/me`: el propio usuario puede eliminar su cuenta.
+- Subida de imagen de producto a Cloudinary (`POST`/`PATCH /api/products`, campo
+  `image` en `multipart/form-data`).
+- `PATCH /api/orders/:id`: edita las líneas de un pedido ya creado y recalcula el
+  total, releyendo nombres y precios de la base de datos.
+- Exportar e importar en CSV el catálogo de productos
+  (`GET`/`POST /api/products/export|import`) y el listado de pedidos
+  (`GET`/`POST /api/orders/export|import`, la importación solo cambia el estado). La
+  exportación descarga el fichero directamente en la respuesta HTTP (con BOM UTF-8
+  para que Excel muestre bien los acentos); la importación recibe el CSV como
+  fichero subido. Ninguno de los dos toca el disco del servidor.
 
 ### Changed
 
@@ -45,6 +59,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
   como valores por defecto.
 - `isAuth` e `isAdmin` viven juntos en `src/middlewares/auth.middleware.js`, que ahora
   exporta las dos funciones. Desaparece `isAdmin.middleware.js`.
+- `DELETE /api/users/me` (antes con este mismo controlador para todos los casos) pasa
+  a llamarse `deleteMe`, distinto de `deleteUser` (admin, por id). Un admin no puede
+  eliminar su propia cuenta por `DELETE /api/users/:id`.
+- Lógica de creación y actualización de pedidos extraída a `src/services/pedidos.js`
+  (`crearPedido`, `actualizarPedido`), separada del controlador.
 
 ### Removed
 
@@ -61,3 +80,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - `login` no traía el `password` del usuario (`select: false` en el modelo), así que
   la comprobación de contraseña fallaba siempre.
 - `src/config/cloudynary.js` estaba vacío pese a estar ya montado en el proyecto.
+- `ALLOWED_ORIGINS=*` no funcionaba: `cors` compara cada origen literalmente cuando
+  recibe un array, así que `*` nunca coincidía con el origen real de la petición.
+  Ahora, si la lista contiene `*`, se refleja cualquier origen (`origin: true`).
+- El `catch` de `sendTelegramMessage` estaba vacío; ahora registra el fallo con
+  `console.error` en vez de tragárselo en silencio.
