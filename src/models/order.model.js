@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-// Copia de cada línea del pedido: nombre y precio quedan fijados en el momento
-// de la compra, aunque el producto cambie o se borre más adelante.
 const OrderItemSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
@@ -39,8 +37,6 @@ const OrderSchema = new mongoose.Schema(
         message: 'El pedido debe tener al menos un producto'
       }
     },
-    // Copia de la dirección elegida: si el usuario la edita o la borra después,
-    // el pedido conserva a dónde se envió de verdad.
     shippingAddress: {
       street: {type: String, required: true},
       city: {type: String, required: true},

@@ -1,7 +1,6 @@
 const Contact = require('../models/contact.model');
 const sendTelegramMessage = require('../config/telegram');
 
-// Guarda un mensaje de contacto y avisa por Telegram si está configurado
 const createContact = async (req, res) => {
   try {
     const {name, email, message} = req.body;
@@ -20,7 +19,6 @@ const createContact = async (req, res) => {
   }
 };
 
-// Lista los mensajes de contacto recibidos (admin)
 const getContacts = async (req, res) => {
   try {
     const contacts = await Contact.find().sort({createdAt: -1});
@@ -30,7 +28,6 @@ const getContacts = async (req, res) => {
   }
 };
 
-// Elimina un mensaje de contacto por su ID (admin)
 const deleteContact = async (req, res) => {
   try {
     const contact = await Contact.findByIdAndDelete(req.params.id);

@@ -13,7 +13,7 @@ const sendTelegramMessage = async (text) => {
       body: JSON.stringify({chat_id: chatId, text})
     });
   } catch {
-    // Silenciado
+    console.error('No se pudo enviar el mensaje de Telegram');
   }
 };
 

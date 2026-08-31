@@ -9,10 +9,8 @@ const {
 
 const router = express.Router();
 
-// Listar categorías es público: cualquiera navegando la tienda las necesita
 router.get('/', getCategories);
 
-// Gestionar el catálogo es solo para admins
 router.post('/', isAuth, isAdmin, createCategory);
 router.patch('/:id', isAuth, isAdmin, updateCategory);
 router.delete('/:id', isAuth, isAdmin, deleteCategory);

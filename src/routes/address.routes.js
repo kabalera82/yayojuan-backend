@@ -4,7 +4,6 @@ const {addAddress, updateAddress, deleteAddress} = require('../controllers/addre
 
 const router = express.Router();
 
-// Todas las rutas de direcciones operan sobre el usuario autenticado
 router.use(isAuth);
 
 router.post('/', addAddress);

@@ -1,6 +1,5 @@
 const Category = require('../models/category.model');
 
-// Lista todas las categorías
 const getCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({name: 1});
@@ -10,7 +9,6 @@ const getCategories = async (req, res) => {
   }
 };
 
-// Crea una nueva categoría
 const createCategory = async (req, res) => {
   try {
     const {name} = req.body;
@@ -27,7 +25,6 @@ const createCategory = async (req, res) => {
   }
 };
 
-// Actualiza una categoría existente
 const updateCategory = async (req, res) => {
   try {
     const {id} = req.params;
@@ -49,7 +46,6 @@ const updateCategory = async (req, res) => {
   }
 };
 
-// Elimina una categoría
 const deleteCategory = async (req, res) => {
   try {
     const {id} = req.params;

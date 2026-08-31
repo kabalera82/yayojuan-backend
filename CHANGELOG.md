@@ -61,3 +61,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - `login` no traía el `password` del usuario (`select: false` en el modelo), así que
   la comprobación de contraseña fallaba siempre.
 - `src/config/cloudynary.js` estaba vacío pese a estar ya montado en el proyecto.
+- `ALLOWED_ORIGINS=*` no funcionaba: `cors` compara cada origen literalmente cuando
+  recibe un array, así que `*` nunca coincidía con el origen real de la petición.
+  Ahora, si la lista contiene `*`, se refleja cualquier origen (`origin: true`).
+- El `catch` de `sendTelegramMessage` estaba vacío; ahora registra el fallo con
+  `console.error` en vez de tragárselo en silencio.
