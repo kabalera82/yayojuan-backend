@@ -39,6 +39,16 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
   `POST /api/users` con rol, `DELETE /api/users/:id`). El registro público
   (`POST /api/users/register`) sigue ignorando cualquier rol enviado por el cliente.
 - `DELETE /api/users/me`: el propio usuario puede eliminar su cuenta.
+- Subida de imagen de producto a Cloudinary (`POST`/`PATCH /api/products`, campo
+  `image` en `multipart/form-data`).
+- `PATCH /api/orders/:id`: edita las líneas de un pedido ya creado y recalcula el
+  total, releyendo nombres y precios de la base de datos.
+- Exportar e importar en CSV el catálogo de productos
+  (`GET`/`POST /api/products/export|import`) y el listado de pedidos
+  (`GET`/`POST /api/orders/export|import`, la importación solo cambia el estado). La
+  exportación descarga el fichero directamente en la respuesta HTTP (con BOM UTF-8
+  para que Excel muestre bien los acentos); la importación recibe el CSV como
+  fichero subido. Ninguno de los dos toca el disco del servidor.
 
 ### Changed
 
@@ -52,6 +62,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - `DELETE /api/users/me` (antes con este mismo controlador para todos los casos) pasa
   a llamarse `deleteMe`, distinto de `deleteUser` (admin, por id). Un admin no puede
   eliminar su propia cuenta por `DELETE /api/users/:id`.
+- Lógica de creación y actualización de pedidos extraída a `src/services/pedidos.js`
+  (`crearPedido`, `actualizarPedido`), separada del controlador.
 
 ### Removed
 

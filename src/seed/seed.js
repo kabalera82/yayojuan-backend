@@ -5,22 +5,27 @@ const connectDB = require('../config/db');
 const User = require('../models/user.model');
 const Product = require('../models/product.model');
 const Category = require('../models/category.model');
+const Order = require('../models/order.model');
+const {crearPedido} = require('../services/pedidos');
 
 const seed = async () => {
   await connectDB();
 
-  await Promise.all([User.deleteMany(), Product.deleteMany(), Category.deleteMany()]);
+  await Promise.all([
+    User.deleteMany(),
+    Product.deleteMany(),
+    Category.deleteMany(),
+    Order.deleteMany()
+  ]);
 
-  const categories = await Category.insertMany([
+  const [verduras, frutas, legumbres, otros] = await Category.insertMany([
     {name: 'Verduras'},
     {name: 'Frutas'},
     {name: 'Legumbres'},
     {name: 'Otros'}
   ]);
 
-  const [verduras, frutas, legumbres, otros] = categories;
-
-  await Product.insertMany([
+  const [tomate, , , pera] = await Product.insertMany([
     {
       name: 'Tomate Raf',
       category: verduras._id,
@@ -43,7 +48,6 @@ const seed = async () => {
       description: 'Manzana ácida, ideal para postres',
       price: 2.8,
       stock: 60,
-
       season: {startMonth: 10, endMonth: 2}
     },
     {
@@ -60,7 +64,6 @@ const seed = async () => {
       description: 'Alubia seca de cosecha propia',
       price: 5.0,
       stock: 20
-
     },
     {
       name: 'Miel de Navarra',
@@ -71,8 +74,7 @@ const seed = async () => {
     }
   ]);
 
-  // User.create() dispara el hook pre-save que hashea la contraseña
-  await User.create([
+  const [, maria] = await User.create([
     {
       username: 'admin',
       userSurname: 'YayoJuan',
@@ -98,6 +100,17 @@ const seed = async () => {
       ]
     }
   ]);
+
+  const pedido = await crearPedido(maria, [
+    {product: tomate._id, quantity: 2},
+    {product: pera._id, quantity: 1}
+  ]);
+
+  if (pedido.message) {
+    console.error('⚠️  No se pudo crear el pedido de ejemplo:', pedido.message);
+  } else {
+    console.warn(`✅ Pedido de ejemplo ${pedido._id} — ${pedido.totalPrice.toFixed(2)} €`);
+  }
 
   console.warn('✅ Semilla insertada correctamente');
   await mongoose.disconnect();
