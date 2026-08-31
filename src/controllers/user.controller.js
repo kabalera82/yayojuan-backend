@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 
-// Registrar usuario
 const register = async (req, res) => {
   try {
     const {username, userSurname, email, phone, password} = req.body;
@@ -21,7 +20,24 @@ const register = async (req, res) => {
   }
 };
 
-// Comprobar usuario y devolver token de autenticación (login)
+const createUser = async (req, res) => {
+  try {
+    const {username, userSurname, email, phone, password, role} = req.body;
+
+    if (!username || !userSurname || !email || !phone || !password) {
+      return res.status(400).json({message: 'Todos los campos son obligatorios'});
+    }
+
+    const newUser = new User({username, userSurname, email, phone, password, role});
+
+    await newUser.save();
+
+    return res.status(200).json({message: 'Usuario creado correctamente'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo crear el usuario'});
+  }
+};
+
 const login = async (req, res) => {
   try {
     const {email, password} = req.body;
@@ -55,7 +71,6 @@ const login = async (req, res) => {
   }
 };
 
-// Devuelve los datos públicos del usuario autenticado sin revelar contraseña
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
@@ -65,11 +80,8 @@ const getMe = async (req, res) => {
   }
 };
 
-// Campos del perfil que se pueden actualizar desde este endpoint.
-// password y role quedan fuera a propósito: cada uno necesita su propio flujo.
 const UPDATABLE_FIELDS = ['username', 'userSurname', 'email', 'phone'];
 
-// Actualiza el perfil del usuario autenticado con el formulario completo
 const updateUser = async (req, res) => {
   try {
     for (const field of UPDATABLE_FIELDS) {
@@ -86,7 +98,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Actualiza la contraseña del usuario autenticado verificando la contraseña actual
 const updatePassword = async (req, res) => {
   try {
     const {currentPassword, newPassword} = req.body;
@@ -107,4 +118,52 @@ const updatePassword = async (req, res) => {
   }
 };
 
-module.exports = {register, login, getMe, updateUser, updatePassword};
+const deleteMe = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user._id);
+    return res.status(200).json({message: 'Cuenta eliminada correctamente'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo eliminar la cuenta'});
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const {id} = req.params;
+
+    if (req.user._id.equals(id)) {
+      return res.status(400).json({message: 'No puedes eliminar tu propia cuenta desde aquí'});
+    }
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(400).json({message: 'Usuario no encontrado'});
+    }
+
+    return res.status(200).json({message: 'Usuario eliminado correctamente'});
+  } catch {
+    return res.status(400).json({message: 'No se pudo eliminar el usuario'});
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find().sort({username: 1});
+    return res.status(200).json(users);
+  } catch {
+    return res.status(400).json({message: 'No se pudo obtener la lista de usuarios'});
+  }
+};
+
+module.exports = {
+  register,
+  createUser,
+  login,
+  getMe,
+  updateUser,
+  updatePassword,
+  deleteMe,
+  deleteUser,
+  getUsers
+};
