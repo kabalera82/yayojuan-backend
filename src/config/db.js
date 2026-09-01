@@ -54,6 +54,10 @@ const connectDB = async () => {
       console.error('👉 Detalle del error:', error.message);
     }
 
+    if (process.env.VERCEL) {
+      throw error;
+    }
+
     process.exit(1);
   }
 };
