@@ -52,6 +52,18 @@ Esto borra lo que hubiera antes y mete categorías, productos y dos usuarios de 
 - **Pedidos** — el precio y el stock siempre se recalculan contra la base de datos en ese momento, nunca se fía de lo que mande el navegador.
 - **Contacto** — guarda el mensaje y avisa al vendedor.
 - **Telegram** — un aviso automático cada vez que entra un pedido o un mensaje nuevo.
+- **Administración** — solo para el rol `admin`: gestión de usuarios con rol, subida
+  de imagen de producto a Cloudinary, edición de pedidos ya creados, y
+  exportar/importar en CSV tanto productos como pedidos.
+
+## 🌍 En producción
+
+**API:** [yayojuan-backend.vercel.app](https://yayojuan-backend.vercel.app)
+
+Corre como función serverless (`vercel.json` + `main.js` exportando la app en vez de
+arrancar `app.listen()`, que solo se ejecuta en local). Las variables de entorno se
+configuran en el panel de Vercel del proyecto, no se leen de ningún `.env` del
+repositorio.
 
 ## 📚 Si necesitas saber más
 
